@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnect {
 	private final String url = "jdbc:postgresql://localhost/web_db";
-	private final String user = "alex";
+	private final String user = "webuser";
 	private final String password = "postgres";
 	
 	private void connect() {
@@ -36,7 +36,7 @@ public class DatabaseConnect {
 	            // Elabora il risultato della query
 	            while (resultSet.next()) {
 	                // Esempio di lettura delle colonne del risultato
-	                int id = resultSet.getInt("id");
+	                int id = resultSet.getInt("cliente_id");
 	                String nome = resultSet.getString("nome");
 	                // E così via per le altre colonne
 	                System.out.println("ID: " + id + ", Nome: " + nome);

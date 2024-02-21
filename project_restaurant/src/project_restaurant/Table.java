@@ -13,9 +13,9 @@ public class Table {
 	public void infoTable() {
 		System.out.println("Table n°"+getNumberId()+"\n seat numbers:"+getSeatNumbers());
 		if(getState()==true)
-			System.out.println(" state: free.\n");
+			System.out.println("state: free.\n");
 		else
-			System.out.println(" state: busy.\n");
+			System.out.println("state: busy.\n");
 	}
 	
 	public Integer getNumberId() {

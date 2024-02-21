@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) {
+		
 		Table[]table=new Table[30];
 		for(int i=0;i<5;i++) {
 			table[i]=new Table(i+1,4);

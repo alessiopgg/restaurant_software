@@ -5,16 +5,16 @@ import java.time.LocalDateTime;// libreria per data e ora
 public class Reservation {
 	private String name;
 	private String phoneNumber;
-	private Integer numberOfPerson;//numero ospiti
-	private LocalDateTime date;//data e ora della prenotazione
-	private String specialRequest;//nota opzionale da parte del cliente
-	
-	public Reservation(String n,String pn,Integer np,LocalDateTime d,String sr) {
-		this.name=n;
-		this.phoneNumber=pn;
-		this.numberOfPerson=np;
-		this.date=d;
-		this.specialRequest=sr;
+	private Integer numberOfPerson;// numero ospiti
+	private LocalDateTime date;// data e ora della prenotazione
+	private String specialRequest;// nota opzionale da parte del cliente
+
+	public Reservation(String n, String pn, Integer np, LocalDateTime d, String sr) {
+		this.name = n;
+		this.phoneNumber = pn;
+		this.numberOfPerson = np;
+		this.date = d;
+		this.specialRequest = sr;
 	}
 
 	public String getName() {
@@ -56,7 +56,5 @@ public class Reservation {
 	public void setSpecialRequest(String specialRequest) {
 		this.specialRequest = specialRequest;
 	}
-	
-	
-	
+
 }

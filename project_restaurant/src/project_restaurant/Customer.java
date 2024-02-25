@@ -4,15 +4,19 @@ import java.time.LocalDateTime;
 
 public class Customer {
 	private Reservation reservation;
+	private String id;
 	
-	public Customer() {
-		// TODO Auto-generated constructor stub
+	public Customer(String id) {
+		this.id=id;
 	}
 	
-	public Reservation createReservation(String n,String pn,Integer np,LocalDateTime d,String sr) {
-		
-		return reservation;
-			
+
+	public String getId() {
+		return id;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 }

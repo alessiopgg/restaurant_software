@@ -1,6 +1,10 @@
 package project_restaurant;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.time.LocalDateTime;// libreria per data e ora
+import project_restaurant.DatabaseConnect;
 
 public class Reservation {
 	private String name;
@@ -8,15 +12,16 @@ public class Reservation {
 	private Integer numberOfPerson;// numero ospiti
 	private LocalDateTime date;// data e ora della prenotazione
 	private String specialRequest;// nota opzionale da parte del cliente
-
+	
 	public Reservation(String n, String pn, Integer np, LocalDateTime d, String sr) {
 		this.name = n;
 		this.phoneNumber = pn;
 		this.numberOfPerson = np;
 		this.date = d;
 		this.specialRequest = sr;
+		
 	}
-
+	
 	public String getName() {
 		return name;
 	}

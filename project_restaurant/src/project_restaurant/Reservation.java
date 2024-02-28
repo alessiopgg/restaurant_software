@@ -1,19 +1,17 @@
 package project_restaurant;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.time.LocalDateTime;// libreria per data e ora
-import project_restaurant.DatabaseConnect;
 
 public class Reservation {
+	private Integer id;
 	private String name;
 	private String phoneNumber;
 	private Integer numberOfPerson;// numero ospiti
 	private LocalDateTime date;// data e ora della prenotazione
 	private String specialRequest;// nota opzionale da parte del cliente
 	
-	public Reservation(String n, String pn, Integer np, LocalDateTime d, String sr) {
+	public Reservation(Integer id,String n, String pn, Integer np, LocalDateTime d, String sr) {
+		this.id=id;
 		this.name = n;
 		this.phoneNumber = pn;
 		this.numberOfPerson = np;
@@ -22,6 +20,14 @@ public class Reservation {
 		
 	}
 	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
 	}

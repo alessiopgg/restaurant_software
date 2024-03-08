@@ -1,6 +1,12 @@
-package project_restaurant;
+package Orm;
 
 import java.sql.Statement;
+
+import domain_model.Customer;
+import domain_model.Food;
+import domain_model.Reservation;
+import domain_model.Table;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,21 +14,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DatabaseConnect {
-	private final String url = "jdbc:postgresql://localhost/web_db";
-	private final String user = "webuser";
-	private final String password = "postgres";
+	private static final String url = "jdbc:postgresql://localhost/web_db";
+	private static final String user = "webuser";
+	private static final String password = "postgres";
+	private static Connection connection = null;
 	
-	public void connect() {
-		try(Connection connection = DriverManager.getConnection(url,user,password);){
-			if(connection!=null) {
-				System.out.println("Connected to PostgreSQL server successfully...");
-			}else {
-				System.out.println("Failed to connect PostgreSQL server...");
-			}
-		
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}
+	static public Connection getConnection() throws SQLException, ClassNotFoundException  {
+		Class.forName("org.postgresql.Driver");//carica dinamicamente il driver JDBC per PostgreSQL.
+		//La classe Class viene utilizzata per caricare in memoria il driver specificato. Questo è 
+		//necessario per poter utilizzare il driver JDBC per comunicare con il database.
+		if(connection==null)
+			connection=DriverManager.getConnection(url,user,password);
+		return connection;
 	}
 	
 	//registra nuovo cliente 
@@ -50,45 +53,7 @@ public class DatabaseConnect {
         }
 	}
 	
-	//eliimina account cliente dal database
-	public boolean deleteCustomer(Customer c){
-		String query = "DELETE FROM Cliente WHERE cognome = ? AND nome = ? AND telefono = ?";
-		try (Connection connection = DriverManager.getConnection(url, user, this.password);
-	             PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, c.getSurname());
-			statement.setString(2, c.getName());
-			statement.setString(3, c.getPhone());
-
-			int rowsInserted = statement.executeUpdate();
-	        return rowsInserted > 0;
-	        
-		} catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
-	}
 	
-	
-	//cerca cliente
-	public boolean findClient(String cognome, String telefono) {
-		String query = "SELECT * FROM Cliente WHERE cognome = ? AND telefono = ?";
-		//TODO: fare in modo che non contino gli spazi o i maiuscoli. Inserire automaticamente il +39
-		try(Connection connection = DriverManager.getConnection(url, user, this.password);
-				PreparedStatement statement = connection.prepareStatement(query)){
-			statement.setString(1, cognome);
-			statement.setString(2, telefono);
-			
-			try(ResultSet resultSet= statement.executeQuery()){
-                // Se il result set ha almeno una riga, il cliente esiste
-				//Il metodo resultSet.next() restituisce true se il result set contiene almeno una riga
-				return resultSet.next();
-			}
-		}catch(SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-				
-	}
 	
 	public boolean createReservation(Reservation r, Customer c) {
 		String query = "INSERT INTO Prenotazione(data_evento, ora_evento, costo_totale, n_persone, note, cliente_id) VALUES (?,?,?,?,?,?)";
@@ -125,8 +90,8 @@ public class DatabaseConnect {
 		String query = "INSERT INTO Conferme(prenotazione, tavolo) VALUES (?,?)";
 		try (Connection connection = DriverManager.getConnection(url, user, this.password);
 	             PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setInt(1, r.getId());
-			statement.setInt(2, t.getNumberId());
+			statement.setString(1, r.getId());
+			statement.setInt(2, t.getNumber());
 			 int rowsInserted = statement.executeUpdate();
 	         return rowsInserted > 0;
 	           
@@ -142,8 +107,8 @@ public class DatabaseConnect {
 		String query = "DELETE FROM Conferme WHERE prenotazione = ? AND tavolo = ?";
 		try (Connection connection = DriverManager.getConnection(url, user, this.password);
 	             PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setInt(1, r.getId());
-			statement.setInt(2, t.getNumberId());
+			statement.setString(1, r.getId());
+			statement.setInt(2, t.getNumber());
 			 int rowsInserted = statement.executeUpdate();
 	         return rowsInserted > 0;
 	           
@@ -177,45 +142,6 @@ public class DatabaseConnect {
 		    }
 	}
 	
-	//aggiungere un piatto al menu
-	public boolean addToMenu(Food food) {
-		String query = "INSERT INTO Menù(piatto, prezzo, descrizione) VALUES (?,?,?)";
-		try (Connection connection = DriverManager.getConnection(url, user, this.password);
-	             PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1,food.getName());
-			statement.setDouble(2,food.getCost());
-			statement.setString(3,food.getDescription());
-			
-			
-			 int rowsInserted = statement.executeUpdate();
-	         return rowsInserted > 0;
-		} catch (SQLException e) {        
-     	// In caso di eccezione durante l'esecuzione della query, stampiamo l'errore
-         e.printStackTrace();
-         // Restituisci false per indicare che la registrazione non è avvenuta con successo
-         return false;
-     }
-		
-	}
-	
-	//rimuove un piatto dal menu
-	public boolean removeToMenu(Food food) {
-		String query = "DELETE FROM Menù WHERE piatto = ? AND prezzo = ? AND descrizione = ?";
-		try(Connection connection = DriverManager.getConnection(url, user, this.password);
-				PreparedStatement statement = connection.prepareStatement(query)){
-			statement.setString(1, food.getName());
-			statement.setDouble(2, food.getCost());
-			statement.setString(3, food.getDescription());
-			
-			int rowsInserted = statement.executeUpdate();
-	        return rowsInserted > 0;
-	        
-		} catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
-	}
-
 
 	public String getUrl() {
 		return url;

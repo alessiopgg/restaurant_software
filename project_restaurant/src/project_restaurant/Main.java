@@ -2,6 +2,9 @@ package project_restaurant;
 
 import java.util.Scanner;
 
+import Orm.DatabaseConnect;
+import domain_model.Table;
+
 public class Main {
 
 	public static void main(String[] args) {

@@ -1,23 +1,18 @@
-package project_restaurant;
-
-import java.time.LocalDateTime;
+package domain_model;
 
 public class Customer {
-	private Reservation reservation;
 	private String id;
 	private String surname;
 	private String name;
 	private String phone;
 	
-	
-	
-
 	public Customer(String id, String surname, String name, String phone) {
 		this.id = id;
 		this.surname = surname;
 		this.name = name;
 		this.phone = phone;
 	}
+	
 
 	public String getId() {
 		return id;

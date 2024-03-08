@@ -1,14 +1,24 @@
-package project_restaurant;
+package domain_model;
 
 public class Food {
+	private String id;
 	private String name;
 	private String description;
 	private Double cost;
 	
-	public Food(String name, String description, Double cost) {
+	public Food(String id,String name, Double cost, String description) {
+		this.id=id;
 		this.name = name;
 		this.description = description;
 		this.cost=cost;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -34,6 +44,12 @@ public class Food {
 	public void setCost(Double cost) {
 		this.cost = cost;
 	}
+	
+	@Override
+	public String toString() {
+	    return "Food[id=" + id + ", name=" + name + ", cost=" + cost + ", description=" + description + "]";
+	}
+
 	
 	 
 	

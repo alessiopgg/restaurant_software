@@ -1,14 +1,12 @@
 package Orm;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import domain_model.Customer;
 import domain_model.Food;
 
 public class MenuDAO {
@@ -42,7 +40,7 @@ public class MenuDAO {
 	}
 	
 	
-	public ArrayList getAllDish() throws ClassNotFoundException, SQLException {
+	public ArrayList<Food> getAllDish() throws ClassNotFoundException, SQLException {
 		ArrayList<Food> menu = new ArrayList<>();
 		String query = "SELECT * FROM Menù";
 		try (Connection connection = DatabaseConnect.getConnection();

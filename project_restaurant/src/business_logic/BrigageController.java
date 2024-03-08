@@ -15,6 +15,6 @@ public class BrigageController {
 	public void markOrder(Order order)throws ClassNotFoundException, SQLException {
 		OrderDAO orderDAO=new OrderDAO();
 		orderDAO.modifyOrderState(order);
-		//TODO: observer
+		order.notifyAdmin();
 	}
 }

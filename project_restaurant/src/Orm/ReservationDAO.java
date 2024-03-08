@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -96,7 +95,10 @@ public class ReservationDAO {
 	            Integer n = rs.getInt("n_persone");
 	            String note=rs.getString("note");
 	            String client_id=rs.getString("cliente_id");
-	            Reservation reservation = new Reservation(id, eventDate, n, note, client_id);
+	            LocalDateTime dateTime = eventDate.withHour(time.getHour())
+                        .withMinute(time.getMinute())
+                        .withSecond(time.getSecond());
+	            Reservation reservation = new Reservation(id, dateTime, n, note, client_id);
 	            dailyReservation.add(reservation);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -120,7 +122,10 @@ public class ReservationDAO {
 	            Integer n = rs.getInt("n_persone");
 	            String note=rs.getString("note");
 	            String client_id=rs.getString("cliente_id");
-	            Reservation reservation = new Reservation(id, eventDate, n, note, client_id);
+	            LocalDateTime dateTime = eventDate.withHour(time.getHour())
+                        .withMinute(time.getMinute())
+                        .withSecond(time.getSecond());
+	            Reservation reservation = new Reservation(id, dateTime, n, note, client_id);
 	            customerReservation.add(reservation);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -143,7 +148,10 @@ public class ReservationDAO {
 	            Integer n = rs.getInt("n_persone");
 	            String note=rs.getString("note");
 	            String client_id=rs.getString("cliente_id");
-	            Reservation reservation = new Reservation(id, eventDate, n, note, client_id);
+	            LocalDateTime dateTime = eventDate.withHour(time.getHour())
+                        .withMinute(time.getMinute())
+                        .withSecond(time.getSecond());
+	            Reservation reservation = new Reservation(id, dateTime, n, note, client_id);
 	            allReservation.add(reservation);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {

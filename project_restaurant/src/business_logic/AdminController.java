@@ -17,7 +17,6 @@ public class AdminController {
 		OrderDAO orderDAO=new OrderDAO();
 		orderDAO.insertOrder(order);
 		
-		//TODO: implementa observer
 	}
 	
 	public void deleteOrder(Order order)throws ClassNotFoundException, SQLException {
@@ -62,7 +61,9 @@ public class AdminController {
 		return reservation.getBill();
 	}
 	
-	
+	public void update(Order order) {
+		System.out.println(order.getId()+" is ready...");
+	}
 	
 	
 }

@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import Orm.OrderDAO;
 import domain_model.Order;
 
-public class BrigageController {
+public class BrigadeController {
 
 	public void viewOrderList()throws ClassNotFoundException, SQLException  {
 		OrderDAO orderDAO=new OrderDAO();

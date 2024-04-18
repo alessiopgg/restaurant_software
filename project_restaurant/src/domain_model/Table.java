@@ -1,22 +1,22 @@
 package domain_model;
 
 public class Table {
-	private String id;
+	private Integer id;
 	private Integer number;
 	private Integer seatNumbers;
 	private Boolean state=false; //true=occupato, false=libero
 
-	public Table(String id,Integer number, Integer sn) {
+	public Table(Integer id,Integer number, Integer sn) {
 		this.id=id;
 		this.number=number;
 		this.seatNumbers=sn;
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

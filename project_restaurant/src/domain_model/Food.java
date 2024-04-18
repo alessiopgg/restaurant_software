@@ -1,23 +1,23 @@
 package domain_model;
 
 public class Food {
-	private String id;
+	private Integer id;
 	private String name;
 	private String description;
 	private Double cost;
 	
-	public Food(String id,String name, Double cost, String description) {
+	public Food(Integer id,String name, Double cost, String description) {
 		this.id=id;
 		this.name = name;
 		this.description = description;
 		this.cost=cost;
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

@@ -13,13 +13,12 @@ import domain_model.Table;
 public class OrderDAO {
 
 	public void insertOrder(Order order) throws ClassNotFoundException, SQLException {
-		String query = "INSERT INTO Ordini (id_cliente, id_prenotazione, id_piatto, id_tavolo) VALUES (?,?,?,?)";
+		String query = "INSERT INTO Ordini ( id_prenotazione, id_piatto, id_tavolo) VALUES (?,?,?)";
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, order.getId_customer());
-			statement.setString(2, order.getId_reservation());
-			statement.setString(3, order.getId_food());
-			statement.setString(4, order.getId_table());
+			statement.setInt(1, order.getId_reservation());
+			statement.setInt(2, order.getId_food());
+			statement.setInt(3, order.getId_table());
 			statement.executeUpdate();
 			statement.close();
 		} catch (SQLException e) {
@@ -27,11 +26,11 @@ public class OrderDAO {
 		}
 	}
 	
-	public void deleteOrder(Order order)throws ClassNotFoundException, SQLException{
+	public void deleteOrder(Integer id)throws ClassNotFoundException, SQLException{
 		String query = "DELETE FROM Ordini WHERE id_ordine = ?";
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, order.getId());
+			statement.setInt(1, id);
 			statement.executeUpdate();
 			statement.close();
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -41,18 +40,17 @@ public class OrderDAO {
 	
 	public ArrayList<Order> getAllOrder()throws ClassNotFoundException, SQLException{
 		ArrayList<Order> allOrder= new ArrayList<>();
-		String query = "SELECT * FROM Order";	
+		String query = "SELECT * FROM Ordini";
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
 			ResultSet rs = statement.executeQuery();	
 			while(rs.next()) {
-				String id=rs.getString("id_ordine");
-				String id_customer=rs.getString("id_cliente");
-	            String id_reservation=rs.getString("id_prenotazione");
-				String id_piatto = rs.getString("id_piatto");
-				String id_tavolo=rs.getString("id_tavolo");
+				Integer id=rs.getInt("id_ordine");
+				Integer id_reservation=rs.getInt("id_prenotazione");
+				Integer id_piatto = rs.getInt("id_piatto");
+				Integer id_tavolo=rs.getInt("id_tavolo");
 				boolean state=rs.getBoolean("stato");
-				Order order=new Order(id, id_customer, id_reservation, id_piatto, id_tavolo, state);
+				Order order=new Order(id, id_reservation, id_piatto, id_tavolo, state);
 				allOrder.add(order);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -63,12 +61,11 @@ public class OrderDAO {
 	}
 	
 	
-	public void modifyOrderState(Order order)throws ClassNotFoundException, SQLException{
-		String query="UPDATE Ordini SET stato = true WHERE id_piatto=? AND id_order=?";
+	public void modifyOrderState(Integer id)throws ClassNotFoundException, SQLException{
+		String query="UPDATE Ordini SET stato = true WHERE id_ordine=?";
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, order.getId_food());
-			statement.setString(2, order.getId());
+			statement.setInt(1,id);
 			statement.executeUpdate();
 			statement.close();
 		} catch (SQLException e) {
@@ -81,16 +78,15 @@ public class OrderDAO {
 		String query = "SELECT * FROM Order WHERE id_tavolo=?";	
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, t.getId());
+			statement.setInt(1, t.getId());
 			ResultSet rs = statement.executeQuery();	
 			while(rs.next()) {
-				String id=rs.getString("id_ordine");
-				String id_customer=rs.getString("id_cliente");
-	            String id_reservation=rs.getString("id_prenotazione");
-				String id_piatto = rs.getString("id_piatto");
-				String id_tavolo=rs.getString("id_tavolo");
+				Integer id=rs.getInt("id_ordine");
+				Integer id_reservation=rs.getInt("id_prenotazione");
+				Integer id_piatto = rs.getInt("id_piatto");
+				Integer id_tavolo=rs.getInt("id_tavolo");
 				boolean state=rs.getBoolean("stato");
-				Order order=new Order(id, id_customer, id_reservation, id_piatto, id_tavolo, state);
+				Order order=new Order(id, id_reservation, id_piatto, id_tavolo, state);
 				tableOrder.add(order);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -109,13 +105,12 @@ public class OrderDAO {
 			statement.setBoolean(1,false);
 			ResultSet rs = statement.executeQuery();	
 			while(rs.next()) {
-				String id=rs.getString("id_ordine");
-				String id_customer=rs.getString("id_cliente");
-	            String id_reservation=rs.getString("id_prenotazione");
-				String id_piatto = rs.getString("id_piatto");
-				String id_tavolo=rs.getString("id_tavolo");
+				Integer id=rs.getInt("id_ordine");
+				Integer id_reservation=rs.getInt("id_prenotazione");
+				Integer id_piatto = rs.getInt("id_piatto");
+				Integer id_tavolo=rs.getInt("id_tavolo");
 				boolean state=rs.getBoolean("stato");
-				Order order=new Order(id, id_customer, id_reservation, id_piatto, id_tavolo, state);
+				Order order=new Order(id, id_reservation, id_piatto, id_tavolo, state);
 				tableOrder.add(order);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -125,14 +120,14 @@ public class OrderDAO {
 		return tableOrder;
 	}
 	
-	public int calculateBill(Reservation reservation) throws ClassNotFoundException, SQLException {
+	public int calculateBill(Integer id) throws ClassNotFoundException, SQLException {
 		Integer bill = null;
 		String query = "SELECT o.id_prenotazione, SUM(m.prezzo) AS costo_totale\r\n" + "FROM Ordini o\r\n"
 				+ "JOIN Menù m ON o.id_piatto = m.id_piatto\r\n" + "WHERE o.id_prenotazione = ? \r\n"
 				+ "GROUP BY o.id_prenotazione";
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, reservation.getId());
+			statement.setInt(1, id);
 			ResultSet rs = statement.executeQuery();
 			if (rs.next()) {
 				bill = rs.getInt("costo_totale");
@@ -141,6 +136,8 @@ public class OrderDAO {
 			e.printStackTrace();
 			return 0;
 		}
+		if(bill==null)
+			return 0;
 		return bill;
 
 	}

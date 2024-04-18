@@ -1,12 +1,12 @@
 package domain_model;
 
 public class Customer {
-	private String id;
+	private Integer id;
 	private String surname;
 	private String name;
 	private String phone;
 	
-	public Customer(String id, String surname, String name, String phone) {
+	public Customer(Integer id, String surname, String name, String phone) {
 		this.id = id;
 		this.surname = surname;
 		this.name = name;
@@ -14,11 +14,11 @@ public class Customer {
 	}
 	
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

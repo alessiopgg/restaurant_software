@@ -6,19 +6,17 @@ import java.util.List;
 
 
 public class Order {
-	private String id;
-	private String id_customer;
-	private String id_reservation;
-	private String id_food;
-	private String id_table;
+	private Integer id;
+	private Integer id_reservation;
+	private Integer id_food;
+	private Integer id_table;
 	private boolean state=false;
     private List<OrderObserver> observers = new ArrayList<>();
 
 	
 	
-	public Order(String id, String id_customer, String id_reservation, String id_food, String id_table, boolean state) {
+	public Order(Integer id, Integer id_reservation, Integer id_food, Integer id_table, boolean state) {
 		this.id = id;
-		this.id_customer = id_customer;
 		this.id_reservation = id_reservation;
 		this.id_food = id_food;
 		this.id_table = id_table;
@@ -42,52 +40,42 @@ public class Order {
         }
     }
     
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
 
-	public String getId_customer() {
-		return id_customer;
-	}
-
-
-	public void setId_customer(String id_customer) {
-		this.id_customer = id_customer;
-	}
-
-
-	public String getId_reservation() {
+	public Integer getId_reservation() {
 		return id_reservation;
 	}
 
 
-	public void setId_reservation(String id_reservation) {
+	public void setId_reservation(Integer id_reservation) {
 		this.id_reservation = id_reservation;
 	}
 
 
-	public String getId_food() {
+	public Integer getId_food() {
 		return id_food;
 	}
 
 
-	public void setId_food(String id_food) {
+	public void setId_food(Integer id_food) {
 		this.id_food = id_food;
 	}
 
 
-	public String getId_table() {
+	public Integer getId_table() {
 		return id_table;
 	}
 
 
-	public void setId_table(String id_table) {
+	public void setId_table(Integer id_table) {
 		this.id_table = id_table;
 	}
 

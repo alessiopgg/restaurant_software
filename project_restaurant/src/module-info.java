@@ -5,5 +5,5 @@
  * @author Alessio
  *
  */
-module project_restaurant {
+interface project_restaurant {
 }

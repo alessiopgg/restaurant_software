@@ -1,27 +1,37 @@
 package Orm;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import domain_model.Customer;
 import domain_model.Reservation;
+import domain_model.Table;
 
 public class ReservationDAO {
 
 	public void insertReservation(Reservation r) throws ClassNotFoundException, SQLException {
-		String query = "INSERT INTO Prenotazione(data_evento, ora_evento, n_persone, note, cliente_id) VALUES (?,?,?,?,?,?)";
+		String query = "INSERT INTO Prenotazione(data_evento, ora_evento, n_persone, note, tavolo ,cliente_id) VALUES (?,?,?,?,?,?)";
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1,r.getDate().getDayOfMonth() + "/" + r.getDate().getMonthValue() + "/" + r.getDate().getYear());
-			statement.setString(2, r.getDate().getHour() + ":" + r.getDate().getMinute());
+			
+			 // Inserisci la data
+	        statement.setDate(1, Date.valueOf(r.getDate().toLocalDate())); // Converti LocalDateTime in LocalDate
+
+	        // Inserisci l'ora
+	        statement.setTime(2, Time.valueOf(r.getDate().toLocalTime())); // Converti LocalDateTime in LocalTime
+			
 			statement.setInt(3, r.getNumberOfPerson());
 			statement.setString(4, r.getSpecialRequest());
-			statement.setString(5, r.getName());
+			statement.setInt(5, r.getTable());
+			statement.setInt(6, r.getName());
 			statement.executeUpdate();
 			statement.close();
 		} catch (SQLException e) {
@@ -29,11 +39,11 @@ public class ReservationDAO {
 		}
 	}
 	
-	public void deleteReservation(Reservation r)throws ClassNotFoundException, SQLException{
+	public void deleteReservation(Integer id)throws ClassNotFoundException, SQLException{
 		String query = "DELETE FROM Prenotazione WHERE id_prenotazione = ?";
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, r.getId());
+			statement.setInt(1, id);
 			statement.executeUpdate();
 			statement.close();
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -41,64 +51,67 @@ public class ReservationDAO {
 		}
 	}
 	
-	public boolean checkReservation(Reservation r)throws ClassNotFoundException, SQLException{
-		String query = "SELECT id_tavolo, COUNT(*) AS num_tavoli_disponibili\r\n"
-				+ "FROM Tavolo\r\n"
-				+ "WHERE n_posti >= ? -- Numero di posti richiesto\r\n"
-				+ "AND occupazione = false -- Il tavolo non è occupato\r\n"
-				+ "AND id_tavolo NOT IN (\r\n"
-				+ "    SELECT DISTINCT id_tavolo\r\n"
-				+ "    FROM Prenotazione\r\n"
-				+ "    WHERE data_evento = ? -- Data della prenotazione\r\n"
-				+ "    AND ora_evento BETWEEN ? AND ? -- Ora della prenotazione e tre ore dopo\r\n"
-				+ ")\r\n"
-				+ "GROUP BY id_tavolo";
+	public Integer getIdCustomer(Integer id)throws ClassNotFoundException, SQLException{
+		String query ="SELECT cliente_id FROM Prenotazione WHERE id_prenotazione = ?";
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setInt(1, r.getNumberOfPerson());
-			statement.setString(2, r.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-			statement.setString(3, r.getDate().toString()); // Impostare l'ora come stringa nel formato "HH:mm"
-		    statement.setString(4, r.getDate().plusHours(3).toLocalTime().toString()); // Impostare l'ora dopo tre ore
-		    ResultSet rs = statement.executeQuery();
-		    while (rs.next()) {
-	            int num_tavoli_disponibili = rs.getInt("num_tavoli_disponibili");
-	            // Verifica se il numero di tavoli disponibili è maggiore di zero
-	            if (num_tavoli_disponibili > 0) {
-	                // Tavoli disponibili trovati, la prenotazione può essere completata
-	                return true;
-	            }
-	        }
-	    } catch (SQLException | ClassNotFoundException e) {
-	        e.printStackTrace();
-	        
-	    }
-	    
-	    // Nessun tavolo disponibile trovato che soddisfi i requisiti della prenotazione
-	    return false;
-
+			statement.setInt(1, id);
+			 try (ResultSet rs = statement.executeQuery()) {
+		            if (rs.next()) {
+		                return rs.getInt("cliente_id");
+		            } else {
+		                return null;
+		            }
+		        }
+		    } catch (SQLException | ClassNotFoundException e) {
+		        e.printStackTrace();
+		        return null;
 			
 		}
 	
+	}
 	
+
+	public Integer getIdTable(Integer idR)throws ClassNotFoundException, SQLException{
+		String query ="SELECT tavolo FROM Prenotazione WHERE  id_prenotazione =?";
+		try (Connection connection = DatabaseConnect.getConnection();
+				PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setInt(1, idR);
+			 try (ResultSet rs = statement.executeQuery()) {
+		            if (rs.next()) {
+		                return rs.getInt("tavolo");
+		            } else {
+		                return null;
+		            }
+		        }
+		    } catch (SQLException | ClassNotFoundException e) {
+		        e.printStackTrace();
+		        return null;
+			
+		}
+	
+	}
+	
+	//TODO:non funge
 	public ArrayList<Reservation> getDailyReservation(LocalDateTime day)throws ClassNotFoundException, SQLException{
 		ArrayList<Reservation> dailyReservation= new ArrayList<>();
-		String formattedDate = day.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		String query = "SELECT * FROM Prenotazione WHERE data_evento = ?";	
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, formattedDate);
+			statement.setDate(1, Date.valueOf(day.toLocalDate()));
 			ResultSet rs = statement.executeQuery();	
 			while(rs.next()) {
-				String id=rs.getString("id_prenotazione");
+				Integer id=rs.getInt("id_prenotazione");
 	            LocalDateTime eventDate = rs.getTimestamp("data_evento").toLocalDateTime();
 	            LocalDateTime time = rs.getTimestamp("ora_evento").toLocalDateTime();
 	            Integer n = rs.getInt("n_persone");
 	            String note=rs.getString("note");
-	            String client_id=rs.getString("cliente_id");
+	            Integer t=rs.getInt("tavolo");
+	            Integer client_id=rs.getInt("cliente_id");
 	            LocalDateTime dateTime = eventDate.withHour(time.getHour())
                         .withMinute(time.getMinute())
                         .withSecond(time.getSecond());
-	            Reservation reservation = new Reservation(id, dateTime, n, note, client_id);
+	            Reservation reservation = new Reservation(id, dateTime, n, note, t,client_id);
 	            dailyReservation.add(reservation);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -108,24 +121,25 @@ public class ReservationDAO {
 		return dailyReservation;
 	}
 	
-	public ArrayList<Reservation> getCustomerReservation(Customer customer)throws ClassNotFoundException, SQLException{
+	public ArrayList<Reservation> getCustomerReservation(Integer id)throws ClassNotFoundException, SQLException{
 		ArrayList<Reservation> customerReservation= new ArrayList<>();
 		String query = "SELECT * FROM Prenotazione WHERE cliente_id = ?";	
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, customer.getId());
+			statement.setInt(1, id);
 			ResultSet rs = statement.executeQuery();	
 			while(rs.next()) {
-				String id=rs.getString("id_prenotazione");
+				Integer idP=rs.getInt("id_prenotazione");
 	            LocalDateTime eventDate = rs.getTimestamp("data_evento").toLocalDateTime();
 	            LocalDateTime time = rs.getTimestamp("ora_evento").toLocalDateTime();
 	            Integer n = rs.getInt("n_persone");
 	            String note=rs.getString("note");
-	            String client_id=rs.getString("cliente_id");
+	            Integer t=rs.getInt("tavolo");
+	            Integer client_id=rs.getInt("cliente_id");
 	            LocalDateTime dateTime = eventDate.withHour(time.getHour())
                         .withMinute(time.getMinute())
                         .withSecond(time.getSecond());
-	            Reservation reservation = new Reservation(id, dateTime, n, note, client_id);
+	            Reservation reservation = new Reservation(idP, dateTime, n, note,t ,client_id);
 	            customerReservation.add(reservation);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -142,16 +156,17 @@ public class ReservationDAO {
 				PreparedStatement statement = connection.prepareStatement(query)) {
 			ResultSet rs = statement.executeQuery();	
 			while(rs.next()) {
-				String id=rs.getString("id_prenotazione");
+				Integer id=rs.getInt("id_prenotazione");
 	            LocalDateTime eventDate = rs.getTimestamp("data_evento").toLocalDateTime();
 	            LocalDateTime time = rs.getTimestamp("ora_evento").toLocalDateTime();
 	            Integer n = rs.getInt("n_persone");
 	            String note=rs.getString("note");
-	            String client_id=rs.getString("cliente_id");
+	            Integer t=rs.getInt("tavolo");
+	            Integer client_id=rs.getInt("cliente_id");
 	            LocalDateTime dateTime = eventDate.withHour(time.getHour())
                         .withMinute(time.getMinute())
                         .withSecond(time.getSecond());
-	            Reservation reservation = new Reservation(id, dateTime, n, note, client_id);
+	            Reservation reservation = new Reservation(id, dateTime, n, note,t, client_id);
 	            allReservation.add(reservation);
 			}
 		}catch (SQLException | ClassNotFoundException e ) {
@@ -160,6 +175,49 @@ public class ReservationDAO {
 		}
 		return allReservation;
 	}
+	
+	public void setBill(Integer bill,Integer id)throws ClassNotFoundException, SQLException{
+		String query="UPDATE Prenotazione SET conto = ? WHERE id_prenotazione = ?";
+		try (Connection connection = DatabaseConnect.getConnection();
+				PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setInt(1, bill);
+			statement.setInt(2, id);
+			statement.executeUpdate();
+			statement.close();
+		}catch (SQLException | ClassNotFoundException e ) {
+			e.printStackTrace();
+
+		}
+	}
+	
+	public ArrayList<Table> getTableDate(LocalDateTime dateTime)throws ClassNotFoundException, SQLException{//ritorna i tavoli occupati in un giorno ad una certa ora
+		ArrayList<Table> tableList= new ArrayList<>();
+		String query = "SELECT * FROM Prenotazione WHERE data_evento = ? AND ora_evento BETWEEN ? AND ?";	
+		try (Connection connection = DatabaseConnect.getConnection();
+				PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setDate(1, Date.valueOf(dateTime.toLocalDate()));
+			  Time startTime = Time.valueOf(dateTime.minusHours(1).minusMinutes(30).toLocalTime());
+		        // Calcola l'ora un'ora e mezza dopo la data e ora specificate
+		        Time endTime = Time.valueOf(dateTime.plusHours(1).plusMinutes(30).toLocalTime());
+		        // Imposta l'ora della prenotazione - un'ora e mezza prima
+		        statement.setTime(2, startTime);
+		        // Imposta l'ora della prenotazione + un'ora e mezza
+		        statement.setTime(3, endTime);	
+		      ResultSet rs = statement.executeQuery();	
+			while(rs.next()) {
+				Integer id_table=rs.getInt("tavolo");
+				Integer n= rs.getInt("n_persone");
+				Table table = new Table(id_table,null,n);
+	            tableList.add(table);
+			}
+		}catch (SQLException | ClassNotFoundException e ) {
+			e.printStackTrace();
+			return null;
+		}
+		return tableList;
+	}
+	
+	
 	
 	
 	

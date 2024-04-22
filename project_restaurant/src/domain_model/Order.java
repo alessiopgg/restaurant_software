@@ -1,16 +1,18 @@
 package domain_model;
 
 import business_logic.OrderObserver;
+import business_logic.OrderSubject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Order {
+public class Order implements OrderSubject{
 	private Integer id;
 	private Integer id_reservation;
 	private Integer id_food;
 	private Integer id_table;
-	private boolean state=false;
+	private boolean state;
     private List<OrderObserver> observers = new ArrayList<>();
 
 	
@@ -21,19 +23,23 @@ public class Order {
 		this.id_food = id_food;
 		this.id_table = id_table;
 		this.state = state;
+
 	}
 	
 	 // Metodo per registrare gli osservatori
+    @Override
     public void attach(OrderObserver observer) {
         observers.add(observer);
     }
 
     // Metodo per rimuovere gli osservatori
+    @Override
     public void detach(OrderObserver observer) {
         observers.remove(observer);
     }
 
     // Metodo per notificare l'admin
+    @Override
     public void notifyAdmin() {
         for (OrderObserver observer : observers) {
             observer.update(this);

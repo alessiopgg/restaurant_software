@@ -60,6 +60,31 @@ public class OrderDAO {
 		return allOrder;
 	}
 	
+	public Order getOrder(Integer id)throws ClassNotFoundException, SQLException{
+		String query = "SELECT * FROM Ordini WHERE id_ordine=?";	
+		try (Connection connection = DatabaseConnect.getConnection();
+				PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setInt(1, id);
+			ResultSet rs = statement.executeQuery();	
+			 if (rs.next()) {
+		            Integer i = rs.getInt("id_ordine");
+		            Integer id_reservation = rs.getInt("id_prenotazione");
+		            Integer id_piatto = rs.getInt("id_piatto");
+		            Integer id_tavolo = rs.getInt("id_tavolo");
+		            boolean state = rs.getBoolean("stato");
+		            Order order = new Order(i, id_reservation, id_piatto, id_tavolo, state);
+		            return order;
+		        } else {
+		            // Nessun ordine trovato con l'ID specificato
+		            return null;
+		        }
+		}catch (SQLException | ClassNotFoundException e ) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
 	
 	public void modifyOrderState(Integer id)throws ClassNotFoundException, SQLException{
 		String query="UPDATE Ordini SET stato = true WHERE id_ordine=?";
@@ -73,9 +98,35 @@ public class OrderDAO {
 		}
 	}
 	
+
+	public ArrayList<Order> getReservationOrder(Integer id)throws ClassNotFoundException, SQLException{
+		ArrayList<Order> orderL= new ArrayList<>();
+		String query = "SELECT * FROM Ordini WHERE id_prenotazione=?";	
+		try (Connection connection = DatabaseConnect.getConnection();
+				PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setInt(1, id);
+			ResultSet rs = statement.executeQuery();	
+			while(rs.next()) {
+				Integer i=rs.getInt("id_ordine");
+				Integer id_reservation=rs.getInt("id_prenotazione");
+				Integer id_piatto = rs.getInt("id_piatto");
+				Integer id_tavolo=rs.getInt("id_tavolo");
+				boolean state=rs.getBoolean("stato");
+				Order order=new Order(i, id_reservation, id_piatto, id_tavolo, state);
+				orderL.add(order);
+			}
+		}catch (SQLException | ClassNotFoundException e ) {
+			e.printStackTrace();
+			return null;
+		}
+		return orderL;
+	}
+	
+	
+	
 	public ArrayList<Order> getTableOrder(Table t)throws ClassNotFoundException, SQLException{
 		ArrayList<Order> tableOrder= new ArrayList<>();
-		String query = "SELECT * FROM Order WHERE id_tavolo=?";	
+		String query = "SELECT * FROM Ordini WHERE id_tavolo=?";	
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setInt(1, t.getId());
@@ -99,7 +150,7 @@ public class OrderDAO {
 
 	public ArrayList<Order> getUncompletedOrder()throws ClassNotFoundException, SQLException{
 		ArrayList<Order> tableOrder= new ArrayList<>();
-		String query = "SELECT * FROM Order WHERE stato=?";	
+		String query = "SELECT * FROM Ordini WHERE stato=? OR stato IS NULL";	
 		try (Connection connection = DatabaseConnect.getConnection();
 				PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setBoolean(1,false);

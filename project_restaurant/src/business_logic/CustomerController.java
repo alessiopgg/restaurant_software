@@ -9,6 +9,7 @@ import Orm.MenuDAO;
 import Orm.ReservationDAO;
 import Orm.TableDAO;
 import domain_model.Customer;
+import domain_model.Food;
 import domain_model.Reservation;
 import domain_model.Table;
 
@@ -43,29 +44,34 @@ public class CustomerController {
 		}else System.out.println("Account not found...");
 	}
 	
-	public void viewMenu()throws ClassNotFoundException, SQLException {
-		MenuDAO menuDAO=new MenuDAO();
-		System.out.println("  ID  |  Piatto                        | Prezzo | Descrizione");
-	        System.out.println("------|--------------------------------|--------|------------------------------------");
-	        for(int i=0; i<menuDAO.getAllDish().size(); i++) {
-	        	System.out.printf(" %-5s|  %-30s| %-7.2f| %-35s%n", menuDAO.getAllDish().get(i).getId(),menuDAO.getAllDish().get(i).getName(),menuDAO.getAllDish().get(i).getCost(),menuDAO.getAllDish().get(i).getDescription());	
-		}
-	        System.out.println("\n\n");
+	public void viewMenu() throws ClassNotFoundException, SQLException {
+	    MenuDAO menuDAO = new MenuDAO();
+	    ArrayList<Food> allDishes = menuDAO.getAllDish();
+	    
+	    System.out.println("  ID  |  Piatto                        | Prezzo | Descrizione");
+	    System.out.println("------|--------------------------------|--------|------------------------------------");
+	    
+	    for (Food dish : allDishes) {
+	        System.out.printf(" %-5s|  %-30s| %-7.2f| %-35s%n", dish.getId(), dish.getName(), dish.getCost(), dish.getDescription());	
+	    }
+	    
+	    System.out.println("\n\n");
 	}
+
 	public void viewMyReservation(Customer customer) throws ClassNotFoundException, SQLException {
 	    ReservationDAO reservationDAO = new ReservationDAO();
+	    ArrayList<Reservation> customerReservations = reservationDAO.getCustomerReservation(customer.getId());
 
 	    System.out.println("\n\nPrenotazioni attive:");
 	    System.out.println("   ID   |       Data       |  Ospiti  |           Richiesta           ");
 	    System.out.println("--------|------------------|----------|-------------------------------");
 
-	    for (int i=0; i<reservationDAO.getCustomerReservation(customer.getId()).size();i++) {
-	        System.out.printf("   %-5s| %-16s |    %-5d | %-35s%n",reservationDAO.getCustomerReservation(customer.getId()).get(i).getId() ,
-	        		reservationDAO.getCustomerReservation(customer.getId()).get(i).getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-	        		reservationDAO.getCustomerReservation(customer.getId()).get(i).getNumberOfPerson(), reservationDAO.getCustomerReservation(customer.getId()).get(i).getSpecialRequest());
+	    for (Reservation reservation : customerReservations) {
+	        System.out.printf("   %-5s| %-16s |    %-5d | %-35s%n", reservation.getId(),
+	                reservation.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+	                reservation.getNumberOfPerson(), reservation.getSpecialRequest());
 	    }
 	}
-
 	
 	public void newReservation(Reservation reservation)throws ClassNotFoundException, SQLException{
 		ReservationDAO reservationDAO=new ReservationDAO();

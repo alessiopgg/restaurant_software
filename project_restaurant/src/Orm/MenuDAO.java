@@ -27,19 +27,30 @@ public class MenuDAO {
 		}
 	}
 	
-	public boolean deleteDish(Integer id)throws ClassNotFoundException, SQLException {
-		String query = "DELETE FROM Menù WHERE id_piatto = ?";
-		try(Connection connection = DatabaseConnect.getConnection();
-				PreparedStatement statement = connection.prepareStatement(query)){
-			statement.setInt(1, id);
-			statement.executeUpdate();
-			statement.close();
-			return true;
-		} catch (SQLException e) {
+	public boolean deleteDish(Integer id) throws ClassNotFoundException, SQLException {
+	    String deleteOrdersQuery = "DELETE FROM Ordini WHERE id_piatto = ?";
+	    String deleteDishQuery = "DELETE FROM Menù WHERE id_piatto = ?";
+	    
+	    try (Connection connection = DatabaseConnect.getConnection();
+	         PreparedStatement deleteOrdersStatement = connection.prepareStatement(deleteOrdersQuery);
+	         PreparedStatement deleteDishStatement = connection.prepareStatement(deleteDishQuery)) {
+	        
+	        // Elimina gli ordini associati al piatto
+	        deleteOrdersStatement.setInt(1, id);
+	        deleteOrdersStatement.executeUpdate();
+	        
+	        // Elimina il piatto dal menù
+	        deleteDishStatement.setInt(1, id);
+	        deleteDishStatement.executeUpdate();
+	        
+	        return true;
+	        
+	    } catch (SQLException e) {
 	        e.printStackTrace();
 	        return false;
-	    }	
+	    }
 	}
+
 	
 	public boolean checkItem(Integer id) throws ClassNotFoundException, SQLException {
 		String query = "SELECT * FROM Menù WHERE id_piatto = ?";

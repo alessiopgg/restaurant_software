@@ -49,7 +49,7 @@ public class Main {
                     customerMenu(scanner, customerController);
                     break;
                 case 2:
-                    brigadeMenu(scanner, brigadeController);
+                    brigadeMenu(scanner, brigadeController, adminController);
                     break;
                 case 3:
                     adminMenu(scanner, adminController);
@@ -74,7 +74,7 @@ public class Main {
 			
 			System.out.print("--> ");
 			int choice = scanner.nextInt();
-			scanner.nextLine(); // Consuma il carattere newline dopo nextInt()
+			scanner.nextLine();
 			System.out.println("\n");
 
 			switch (choice) {
@@ -114,7 +114,7 @@ public class Main {
 						System.out.println("3. Effettua una nuova prenotazione");
 						System.out.println("4. Cancella una prenotazione");
 						System.out.println("5. Torna indietro");
-
+						System.out.print("--> ");
 						choice = scanner.nextInt();
 						scanner.nextLine();
 
@@ -198,13 +198,15 @@ public class Main {
 		}
 	}
 
-    public static void brigadeMenu(Scanner scanner, BrigadeController brigadeController) throws ClassNotFoundException, SQLException {
+    public static void brigadeMenu(Scanner scanner, BrigadeController brigadeController, AdminController adminController) throws ClassNotFoundException, SQLException {
         while (true) {
             System.out.println("\n\nMenu brigata di cucina:");
             System.out.println("1. Visualizza la lista degli ordini");
             System.out.println("2. Segna un ordine come completato");
-            System.out.println("3. Torna indietro");
-
+            System.out.println("3. Visualizza la lista degli ordini incompleti");
+            System.out.println("4. Visualizza lista ottimizzata");
+            System.out.println("5. Torna indietro");
+            System.out.print("--> ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consuma il carattere newline dopo nextInt()
 
@@ -220,10 +222,18 @@ public class Main {
                 	System.out.print("Digita l'ID dell'ordine completato: ");
                 	int id= scanner.nextInt();
                 	scanner.nextLine();
-                	brigadeController.markOrder(id);
+                	brigadeController.markOrder(id,adminController);
 
                 	break;
                 case 3:
+                	
+                	brigadeController.viewOrderUncompleted();
+                	
+                	break;
+                	
+                case 4:
+                	brigadeController.viewOrderOptimized();
+                case 5:
                     // Torna indietro
                     return;
                 default:
@@ -244,7 +254,8 @@ public class Main {
             System.out.println("7. Calcola il conto di una prenotazione");
             System.out.println("8. Crea un ordine");
             System.out.println("9. Elimina un ordine");
-            System.out.println("10. Torna indietro");
+            System.out.println("10. Visualizza l'ordine di una prenotazione");
+            System.out.println("12. Torna indietro");
             System.out.print("--> ");
 
             int choice = scanner.nextInt();
@@ -288,7 +299,7 @@ public class Main {
                 	String dateStr = scanner.nextLine();
                 	try {
                 	    LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                	    adminController.viewDailyReservation(date.atStartOfDay()); //Imposta l'ora a mezzanotte (00:00:00)
+                	    adminController.viewDailyReservation(date.atStartOfDay());
                 	} catch (DateTimeParseException e) {
                 	    e.printStackTrace();
                 	}
@@ -306,7 +317,6 @@ public class Main {
                 	Integer idP=scanner.nextInt();
                     scanner.nextLine();
                     System.out.println("Conto totale: "+adminController.bill(idP));
-                    // Implementa la logica per calcolare il conto di una prenotazione
                     break;
                 case 8:
                 	System.out.print("Inserisci ID della prenotazione per associargli un ordine: ");
@@ -339,6 +349,13 @@ public class Main {
                 	
                 	break;
                 case 10:
+                	System.out.print("Inserisci ID della prenotazione per visualizzare il suo ordine: ");
+                	idP=scanner.nextInt();
+                    scanner.nextLine();
+                    adminController.viewOrderReservation(idP);
+                	break;
+                	
+                case 12:
                     // Torna indietro
                     return;
                 default:

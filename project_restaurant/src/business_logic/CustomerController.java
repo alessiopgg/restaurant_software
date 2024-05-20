@@ -15,15 +15,16 @@ import domain_model.Table;
 
 public class CustomerController {
 
-	public void signIn(Customer customer)throws ClassNotFoundException, SQLException {
+	public boolean signIn(Customer customer)throws ClassNotFoundException, SQLException {
 		CustomerDAO customerDAO= new CustomerDAO();
 		if(customerDAO.checkNumberPhone(customer)==false) {
 			customerDAO.addCustomer(customer);
             System.out.println("Registrazione avvenuta con successo!\n");
-
+return true;
 		}else {
 			System.out.println("Phone number alredy used...\n");
 		}
+	return false;
 	}
 	
 	public boolean login(Customer customer)throws ClassNotFoundException, SQLException {
@@ -99,13 +100,15 @@ public class CustomerController {
 	
 	
 public boolean checkMyReservation(Integer idReservation,Customer c) throws ClassNotFoundException, SQLException{
-	ReservationDAO reservationDAO= new ReservationDAO();
-	
-	for(int i=0; i<reservationDAO.getCustomerReservation(c.getId()).size();i++) {
-		if(reservationDAO.getCustomerReservation(c.getId()).get(i).getName()==c.getId())
-			return true;
-	}
-	return false;
+	ReservationDAO reservationDAO = new ReservationDAO();
+    ArrayList<Reservation> customerReservations = reservationDAO.getCustomerReservation(c.getId());
+
+    for (Reservation reservation : customerReservations) {
+        if (reservation.getId().equals(idReservation)) {
+            return true;
+        }
+    }
+    return false;
 	}
 	
 	public void deleteReservation(Integer id)throws ClassNotFoundException, SQLException{

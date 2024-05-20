@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import domain_model.Order;
@@ -12,18 +13,24 @@ import domain_model.Table;
 
 public class OrderDAO {
 
-	public void insertOrder(Order order) throws ClassNotFoundException, SQLException {
+	public Integer insertOrder(Order order) throws ClassNotFoundException, SQLException {
 		String query = "INSERT INTO Ordini ( id_prenotazione, id_piatto, id_tavolo) VALUES (?,?,?)";
 		try (Connection connection = DatabaseConnect.getConnection();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+		         PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))  {
 			statement.setInt(1, order.getId_reservation());
 			statement.setInt(2, order.getId_food());
 			statement.setInt(3, order.getId_table());
-			statement.executeUpdate();
-			statement.close();
+			int rowsInserted = statement.executeUpdate();
+	        if (rowsInserted > 0) {
+	            ResultSet generatedKeys = statement.getGeneratedKeys();
+	            if (generatedKeys.next()) {
+	                return generatedKeys.getInt(1);
+	            }
+	        }
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	public void deleteOrder(Integer id)throws ClassNotFoundException, SQLException{

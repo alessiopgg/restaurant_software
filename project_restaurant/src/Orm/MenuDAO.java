@@ -11,22 +11,26 @@ import domain_model.Food;
 
 public class MenuDAO {
 
-	public boolean insertDish(Food food) throws ClassNotFoundException, SQLException {
-		String query = "INSERT INTO Menù(piatto, prezzo, descrizione) VALUES (?,?,?)";
-		try(Connection connection=DatabaseConnect.getConnection();
-				PreparedStatement statement = connection.prepareStatement(query);){
-			statement.setString(1,food.getName());
-			statement.setDouble(2,food.getCost());
-			statement.setString(3,food.getDescription());
-			statement.executeUpdate();
-			statement.close();
-			return true;
-		} catch (SQLException | ClassNotFoundException e ) {
-			e.printStackTrace();
-			return false;
-		}
+	public Integer insertDish(Food food) throws ClassNotFoundException, SQLException {
+	    String query = "INSERT INTO Menù(piatto, prezzo, descrizione) VALUES (?,?,?)";
+	    try (Connection connection = DatabaseConnect.getConnection();
+	         PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+	        statement.setString(1, food.getName());
+	        statement.setDouble(2, food.getCost());
+	        statement.setString(3, food.getDescription());
+	        int rowsInserted = statement.executeUpdate();
+	        if (rowsInserted > 0) {
+	            ResultSet generatedKeys = statement.getGeneratedKeys();
+	            if (generatedKeys.next()) {
+	                return generatedKeys.getInt(1);
+	            }
+	        }
+	    } catch (SQLException | ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
 	}
-	
+
 	public boolean deleteDish(Integer id) throws ClassNotFoundException, SQLException {
 	    String deleteOrdersQuery = "DELETE FROM Ordini WHERE id_piatto = ?";
 	    String deleteDishQuery = "DELETE FROM Menù WHERE id_piatto = ?";
@@ -104,5 +108,22 @@ public class MenuDAO {
 				return null;
 			}
 	}
+	
+	public Food getDish(Integer id) throws ClassNotFoundException, SQLException {
+	    String query = "SELECT * FROM Menù WHERE id_piatto = ?";
+	    try (Connection connection = DatabaseConnect.getConnection();
+	         PreparedStatement statement = connection.prepareStatement(query)) {
+	        statement.setInt(1, id);
+	        try (ResultSet rs = statement.executeQuery()) {
+	            if (rs.next()) {
+	                return new Food(id, rs.getString("piatto"), rs.getDouble("prezzo"), rs.getString("descrizione"));
+	            }
+	        }
+	    } catch (SQLException | ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+
 
 }

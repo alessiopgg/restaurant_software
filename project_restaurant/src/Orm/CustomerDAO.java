@@ -23,13 +23,22 @@ public class CustomerDAO {
 	}
 	
 	public void deleteCustomer(Integer id) throws ClassNotFoundException, SQLException  {
-		try {
-			Connection connection = DatabaseConnect.getConnection();
-			String query = "DELETE FROM Cliente WHERE cliente_id = ?";
-			PreparedStatement statement = connection.prepareStatement(query);
-			statement.setInt(1, id);
-			statement.executeUpdate();
-			statement.close();
+	    String deleteOrdersQuery = "DELETE FROM Ordini WHERE id_prenotazione IN (SELECT id_prenotazione FROM Prenotazione WHERE cliente_id = ?)";
+        String deleteReservationQuery = "DELETE FROM Prenotazione WHERE cliente_id = ?";
+		String deleteClient = "DELETE FROM Cliente WHERE cliente_id = ?";
+		try (Connection connection = DatabaseConnect.getConnection();
+				 PreparedStatement deleteOrdersStatement = connection.prepareStatement(deleteOrdersQuery);
+		         PreparedStatement deleteReservationStatement = connection.prepareStatement(deleteReservationQuery);
+		         PreparedStatement deleteClientStatement = connection.prepareStatement(deleteClient)) {
+			
+			deleteOrdersStatement.setInt(1, id);
+	        deleteOrdersStatement.executeUpdate();
+			
+			deleteReservationStatement.setInt(1, id);
+			deleteReservationStatement.executeUpdate();
+			
+			deleteClientStatement.setInt(1, id);
+			deleteClientStatement.executeUpdate();
 		} catch (SQLException | ClassNotFoundException e ) {
 			e.printStackTrace();
 		}
@@ -105,6 +114,23 @@ public class CustomerDAO {
 	        return null;
 	    }
 	}
+	
+	public Customer getCustomer(Integer id) throws ClassNotFoundException, SQLException {
+	    Customer customer = null;
+	    String query = "SELECT * FROM Cliente WHERE cliente_id = ?";
+	    try (Connection connection = DatabaseConnect.getConnection();
+	         PreparedStatement statement = connection.prepareStatement(query)) {
+	        statement.setInt(1, id);
+	        ResultSet rs = statement.executeQuery();
+	        if (rs.next()) {
+	            customer = new Customer(id, rs.getString("cognome"), rs.getString("nome"), rs.getString("telefono"));
+	        }
+	    } catch (SQLException | ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+	    return customer;
+	}
+
 
 }
 

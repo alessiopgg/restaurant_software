@@ -17,10 +17,10 @@ import domain_model.Table;
 
 public class ReservationDAO {
 
-	public void insertReservation(Reservation r) throws ClassNotFoundException, SQLException {
+	public Integer insertReservation(Reservation r) throws ClassNotFoundException, SQLException {
 		String query = "INSERT INTO Prenotazione(data_evento, ora_evento, n_persone, note, tavolo ,cliente_id) VALUES (?,?,?,?,?,?)";
 		try (Connection connection = DatabaseConnect.getConnection();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+		         PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			
 			 // Inserisci la data
 	        statement.setDate(1, Date.valueOf(r.getDate().toLocalDate())); // Converti LocalDateTime in LocalDate
@@ -32,17 +32,29 @@ public class ReservationDAO {
 			statement.setString(4, r.getSpecialRequest());
 			statement.setInt(5, r.getTable());
 			statement.setInt(6, r.getName());
-			statement.executeUpdate();
-			statement.close();
+			int rowsInserted = statement.executeUpdate();
+			 if (rowsInserted > 0) {
+		            ResultSet generatedKeys = statement.getGeneratedKeys();
+		            if (generatedKeys.next()) {
+		                return generatedKeys.getInt(1);
+		            }
+		        }
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	public void deleteReservation(Integer id)throws ClassNotFoundException, SQLException{
+	    String deleteOrdersQuery = "DELETE FROM Ordini WHERE id_prenotazione = ?";
 		String query = "DELETE FROM Prenotazione WHERE id_prenotazione = ?";
 		try (Connection connection = DatabaseConnect.getConnection();
+				 PreparedStatement deleteOrdersStatement = connection.prepareStatement(deleteOrdersQuery);
 				PreparedStatement statement = connection.prepareStatement(query)) {
+			
+			deleteOrdersStatement.setInt(1, id);
+	        deleteOrdersStatement.executeUpdate();
+			
 			statement.setInt(1, id);
 			statement.executeUpdate();
 			statement.close();
@@ -92,7 +104,6 @@ public class ReservationDAO {
 	
 	}
 	
-	//TODO:non funge
 	public ArrayList<Reservation> getDailyReservation(LocalDateTime day)throws ClassNotFoundException, SQLException{
 		ArrayList<Reservation> dailyReservation= new ArrayList<>();
 		String query = "SELECT * FROM Prenotazione WHERE data_evento = ?";	
@@ -169,11 +180,12 @@ public class ReservationDAO {
 	            Reservation reservation = new Reservation(id, dateTime, n, note,t, client_id);
 	            allReservation.add(reservation);
 			}
+			return allReservation;
+
 		}catch (SQLException | ClassNotFoundException e ) {
 			e.printStackTrace();
 			return null;
 		}
-		return allReservation;
 	}
 	
 	public void setBill(Integer bill,Integer id)throws ClassNotFoundException, SQLException{
@@ -189,6 +201,7 @@ public class ReservationDAO {
 
 		}
 	}
+	
 	
 	public ArrayList<Table> getTableDate(LocalDateTime dateTime)throws ClassNotFoundException, SQLException{//ritorna i tavoli occupati in un giorno ad una certa ora
 		ArrayList<Table> tableList= new ArrayList<>();

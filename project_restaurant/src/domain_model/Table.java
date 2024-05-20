@@ -4,7 +4,6 @@ public class Table {
 	private Integer id;
 	private Integer number;
 	private Integer seatNumbers;
-	private Boolean state=false; //true=occupato, false=libero
 
 	public Table(Integer id,Integer number, Integer sn) {
 		this.id=id;
@@ -35,14 +34,5 @@ public class Table {
 	public void setSeatNumbers(Integer seatNumbers) {
 		this.seatNumbers = seatNumbers;
 	}
-
-	public Boolean getState() {
-		return state;
-	}
-
-	public void setState(Boolean state) {
-		this.state = state;
-	}
-
 
 }

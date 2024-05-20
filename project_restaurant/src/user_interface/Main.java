@@ -60,6 +60,7 @@ public class Main {
                     break;
                 default:
                     System.out.println("Scelta non valida. Riprova.\n");
+                    continue;
             }
         }
     }
@@ -83,10 +84,10 @@ public class Main {
 				System.out.println("\nRegistrazione nuovo profilo...");
 
 				System.out.print("Inserisci il tuo cognome:");
-				String surname = scanner.nextLine();
+				String surname = capitalize(scanner.nextLine());
 				System.out.print("Inserisci il tuo nome:");
-				String name = scanner.nextLine();
-				System.out.print("Inserisci il tuo numero di telefono:");
+				String name = capitalize(scanner.nextLine());
+				System.out.print("Inserisci il tuo numero di telefono:\n(Utilizzare un formato: +39 333 1234567)\n-->");
 				String phone = scanner.nextLine();
 				Customer customer = new Customer(null, surname, name, phone);
 
@@ -98,8 +99,8 @@ public class Main {
 				// Login
 				System.out.println("\nEffettua login...");
 				System.out.print("Inserisci il tuo cognome:");
-				String loginSurname = scanner.nextLine();
-				System.out.print("Inserisci il tuo numero di telefono:");
+				String loginSurname = capitalize(scanner.nextLine());
+				System.out.print("Inserisci il tuo numero di telefono:\n(Utilizzare un formato: +39 333 1234567)\n-->");
 				String loginPhone = scanner.nextLine();
 				Customer loginCustomer = new Customer(customerController.getId(loginPhone), loginSurname, null,
 						loginPhone);
@@ -113,7 +114,8 @@ public class Main {
 						System.out.println("2. Visualizza le tue prenotazioni");
 						System.out.println("3. Effettua una nuova prenotazione");
 						System.out.println("4. Cancella una prenotazione");
-						System.out.println("5. Torna indietro");
+						System.out.println("5. Elimina Account");
+						System.out.println("6. Torna indietro");
 						System.out.print("--> ");
 						choice = scanner.nextInt();
 						scanner.nextLine();
@@ -176,10 +178,26 @@ public class Main {
 							}
 							break;
 						case 5:
+							System.out.println("Vuoi davvero eliminare il tuo account?"
+									+ "?\nDigita:\n0. Annulla\n1. Conferma");
+							int d = scanner.nextInt();
+							scanner.nextLine();
+							if (d == 1) {
+								customerController.deleteAccount(loginCustomer);
+								System.out.println("Account eliminato!");
+								return;
+							} else
+								System.out.println("Operazione interrotta...");
+		
+							
+							break;
+						case 6:
+							
 							// Torna indietro
 							return;
 						default:
 							System.out.println("Scelta non valida. Riprova.");
+							continue;
 						}
 					}
 
@@ -233,11 +251,13 @@ public class Main {
                 	
                 case 4:
                 	brigadeController.viewOrderOptimized();
+                	break;
                 case 5:
                     // Torna indietro
                     return;
                 default:
                     System.out.println("Scelta non valida. Riprova.");
+                    continue;
             }
         }
     }
@@ -306,7 +326,7 @@ public class Main {
                 	break;
                 case 6:
                 	adminController.viewAllCustomer();
-                    System.out.print("\nInserisci l'id del cliente di cui si vuole visualizzare le prenotazioni: ");
+                    System.out.print("\nInserisci l'ID del cliente di cui si vuole visualizzare le prenotazioni: ");
                     Integer id=scanner.nextInt();
                     scanner.nextLine();
                     adminController.viewCustomerReservation(id);
@@ -360,7 +380,16 @@ public class Main {
                     return;
                 default:
                     System.out.println("Scelta non valida. Riprova.");
+                    continue;
             }
         }
     }
+    
+    public static String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    }
+
 }

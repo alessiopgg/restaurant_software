@@ -19,7 +19,8 @@ public class AdminController implements OrderObserver{
 	public void createOrder(Order order)throws ClassNotFoundException, SQLException {
 		OrderDAO orderDAO=new OrderDAO();
 		order.setState(false);
-		orderDAO.insertOrder(order);
+		int i=orderDAO.insertOrder(order);
+		order.setId(i);
 		order.attach(this);
 		
 	}
@@ -31,10 +32,11 @@ public class AdminController implements OrderObserver{
 	
 	public void addToMenu(Food food)throws ClassNotFoundException, SQLException {
 		MenuDAO menuDAO=new MenuDAO();
-		 boolean success = menuDAO.insertDish(food);
-		    if (success) {
+		 int success = menuDAO.insertDish(food);
+		    if (success>0) {
 		        System.out.println("\nPiatto " + food.getName() + " aggiunto al menu!");
 		    }
+		    food.setId(success);
 	}
 	
 	public void deleteToMenu(Integer id)throws ClassNotFoundException, SQLException {
@@ -129,7 +131,7 @@ public class AdminController implements OrderObserver{
 	    }
 	}
 
-	
+	//il conto viene calcolato prendendo tutti gli ordini con lo stesso id di prenotazione
 	public int bill(Integer id)throws ClassNotFoundException, SQLException {
 		OrderDAO orderDAO = new OrderDAO();
 		ReservationDAO reservationDAO= new ReservationDAO();

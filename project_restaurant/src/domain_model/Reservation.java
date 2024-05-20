@@ -6,7 +6,7 @@ import java.time.LocalDateTime;// libreria per data e ora
 public class Reservation {
 	private Integer id;
 	private LocalDateTime date;// data e ora della prenotazione
-	private Integer numberOfPerson;// numero ospiti
+	private Integer numberOfPeople;// numero ospiti
 	private String specialRequest;// nota opzionale da parte del cliente
 	private Integer table;
 	private Integer name;
@@ -15,7 +15,7 @@ public class Reservation {
 	public Reservation(Integer id, LocalDateTime d, Integer np, String sr,Integer t, Integer n) {
 		this.id=id;
 		this.date = d;
-		this.numberOfPerson = np;
+		this.numberOfPeople = np;
 		this.specialRequest = sr;
 		this.table=t;
 		this.name = n;
@@ -38,11 +38,11 @@ public class Reservation {
 	}
 
 	public Integer getNumberOfPerson() {
-		return numberOfPerson;
+		return numberOfPeople;
 	}
 
 	public void setNumberOfPerson(Integer numberOfPerson) {
-		this.numberOfPerson = numberOfPerson;
+		this.numberOfPeople = numberOfPerson;
 	}
 
 	public String getSpecialRequest() {
